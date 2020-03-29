@@ -15,9 +15,9 @@ import timber.log.Timber
 class MainViewModel : ViewModel() {
 
     val selectedOrganization = MutableLiveData<Organization>()
-    val listRepos = MutableLiveData<List<Repo>>()
     val repoClickedEvent = LiveEvent<Repo>()
     val searchQuery = MutableLiveData<String>()
+    val testObject = MutableLiveData<Pair<Organization?, List<Repo>?>>()
 
     val progressVisibility = MutableLiveData(View.VISIBLE)
 
@@ -45,5 +45,26 @@ class MainViewModel : ViewModel() {
     fun searchClicked() {
         progressVisibility.postValue(View.VISIBLE)
         loadOrganization(searchQuery.value)
+        loadRepos(searchQuery.value)
+    }
+
+    private fun loadRepos(organizationName: String?) {
+
+        val reposResponse = githubService.getOrganizationRepos(organizationName!!)
+
+        reposResponse.enqueue(object: Callback<List<Repo>> {
+            override fun onFailure(call: Call<List<Repo>>, t: Throwable) {
+                progressVisibility.postValue(View.GONE)
+                Timber.d(t, "error retrieving repos")
+            }
+
+            override fun onResponse(call: Call<List<Repo>>, response: Response<List<Repo>>) {
+                if (response.isSuccessful) {
+                    progressVisibility.postValue(View.GONE)
+                    val smallerList = response.body()?.sortedBy { it.stargazers_count }?.reversed()?.take(3)
+                    testObject.postValue(Pair(selectedOrganization.value, smallerList))
+                }
+            }
+        })
     }
 }

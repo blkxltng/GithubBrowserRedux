@@ -22,7 +22,7 @@
         tools:layout="@layout/fragment_webview">
 
         <argument
-            android:name="org_url"
+            android:name="repoUrl"
             app:argType="string" />
     </fragment>
 

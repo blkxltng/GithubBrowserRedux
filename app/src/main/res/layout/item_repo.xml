@@ -5,13 +5,16 @@
     xmlns:tools="http://schemas.android.com/tools">
     <data>
         <variable
-            name="repo"
-            type="com.blkxltng.githubbrowserredux.models.Repo" />
+            name="repoViewModel"
+            type="com.blkxltng.githubbrowserredux.ui.main.RepoViewModel" />
     </data>
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:onClick="@{() -> repoViewModel.repoClicked()}">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -23,7 +26,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
-                android:text="@{repo.name}"
+                android:text="@{repoViewModel.singleRepo.name}"
                 android:textColor="@android:color/black"
                 android:textSize="24sp"
                 app:layout_constraintStart_toStartOf="parent"
@@ -35,7 +38,7 @@
                 android:id="@+id/repoDescription"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@{repo.description}"
+                android:text="@{repoViewModel.singleRepo.description}"
                 app:layout_constraintStart_toStartOf="@id/repoName"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/repoName"

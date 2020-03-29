@@ -9,6 +9,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blkxltng.githubbrowserredux.R
 import com.blkxltng.githubbrowserredux.databinding.FragmentMainBinding
@@ -16,8 +17,6 @@ import kotlinx.android.synthetic.main.fragment_main.*
 import timber.log.Timber
 
 class MainFragment : Fragment() {
-
-//    private lateinit var layoutManager: LinearLayoutManager
 
     private lateinit var binding: FragmentMainBinding
     private val viewModel: MainViewModel by viewModels()
@@ -59,10 +58,18 @@ class MainFragment : Fragment() {
 //    }
 
     private fun setupObservers() {
-        viewModel.selectedOrganization.observe(viewLifecycleOwner, Observer {
-            Toast.makeText(context, "You found the organization ${it.name}", Toast.LENGTH_SHORT).show()
+
+        viewModel.testObject.observe(viewLifecycleOwner, Observer {
+            Toast.makeText(context, "You found the organization ${it.first?.name}", Toast.LENGTH_SHORT).show()
             recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-            recyclerView.setControllerAndBuildModels(MainEpoxyController(organization = it, repos = null))
+            val repoList = mutableListOf<RepoViewModel>()
+            it.second?.forEach { repoList.add(RepoViewModel(viewModel).apply { singleRepo.postValue(it) }) }
+            recyclerView.setControllerAndBuildModels(MainEpoxyController(organization = it.first!!, repos = repoList))
+        })
+
+        viewModel.repoClickedEvent.observe(viewLifecycleOwner, Observer {
+            Toast.makeText(context, "You clicked ${it.name}", Toast.LENGTH_SHORT).show()
+            findNavController().navigate(MainFragmentDirections.actionMainFragmentToWebViewFragment(it.html_url))
         })
     }
 
