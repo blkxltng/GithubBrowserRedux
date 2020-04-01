@@ -13,41 +13,15 @@ import retrofit2.Response
 
 class MainViewModel : ViewModel() {
 
-    val selectedOrganization = MutableLiveData<Organization>()
-    val repoClickedEvent = LiveEvent<Repo>()
-    val searchClickedEvent = LiveEvent<Void>()
-    val searchQuery = MutableLiveData<String>()
-    val testObject = MutableLiveData<Pair<Organization?, List<Repo>?>>()
+    val selectedOrganization = MutableLiveData<Organization>() // Used to hold the info for the organization
+    val repoClickedEvent = LiveEvent<Repo>() // Called when the user clicks a repository
+    val searchClickedEvent = LiveEvent<Void>() // Called when the user clicks the search button
+    val searchQuery = MutableLiveData<String>() // Used to keep track of the user's edittext input
+    val repoInfo = MutableLiveData<Pair<Organization?, List<Repo>?>>() // Holds information for the repos as well as the organization
+    val progressVisibility = MutableLiveData(View.GONE) // Used to set progressBar visibility
+    val errorCode = LiveEvent<GitHubErrorCode>() // Used when there is an error to send the user a message
 
-    val progressVisibility = MutableLiveData(View.VISIBLE)
-
-    val errorCode = LiveEvent<GitHubErrorCode>()
-
-    val githubService: GithubService = GithubService()
-
-    private fun loadOrganization(organizationName: String?) {
-
-        val organizationResponse = githubService.getOrganization(organizationName!!)
-
-        organizationResponse.enqueue(object: Callback<Organization> {
-            override fun onResponse(call: Call<Organization>, response: Response<Organization>) {
-                if (response.isSuccessful) {
-//                    progressVisibility.postValue(View.GONE)
-                    selectedOrganization.postValue(response.body())
-                    loadRepos(organizationName)
-                } else {
-                    if(response.code() == 404) {
-                        errorCode.postValue(GitHubErrorCode.NOT_FOUND)
-                    }
-                }
-            }
-
-            override fun onFailure(call: Call<Organization>, t: Throwable) {
-                errorCode.postValue(GitHubErrorCode.ERROR_ORGANIZATION)
-                progressVisibility.postValue(View.GONE)
-            }
-        })
-    }
+    private val githubService: GithubService = GithubService()
 
     fun searchClicked() {
         searchClickedEvent.call()
@@ -60,6 +34,30 @@ class MainViewModel : ViewModel() {
             progressVisibility.postValue(View.VISIBLE)
             loadOrganization(searchQuery.value)
         }
+    }
+
+    private fun loadOrganization(organizationName: String?) {
+
+        val organizationResponse = githubService.getOrganization(organizationName!!)
+
+        organizationResponse.enqueue(object: Callback<Organization> {
+            override fun onResponse(call: Call<Organization>, response: Response<Organization>) {
+                if (response.isSuccessful) {
+                    selectedOrganization.postValue(response.body())
+                    loadRepos(organizationName)
+                } else {
+                    if(response.code() == 404) {
+                        errorCode.postValue(GitHubErrorCode.NOT_FOUND)
+                        progressVisibility.postValue(View.GONE)
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<Organization>, t: Throwable) {
+                errorCode.postValue(GitHubErrorCode.ERROR_ORGANIZATION)
+                progressVisibility.postValue(View.GONE)
+            }
+        })
     }
 
     private fun loadRepos(organizationName: String?) {
@@ -76,7 +74,7 @@ class MainViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     progressVisibility.postValue(View.GONE)
                     val smallerList = response.body()?.sortedBy { it.stargazers_count }?.reversed()?.take(3)
-                    testObject.postValue(Pair(selectedOrganization.value, smallerList))
+                    repoInfo.postValue(Pair(selectedOrganization.value, smallerList))
                 }
             }
         })

@@ -87,7 +87,7 @@ class MainFragment : Fragment() {
             }
         })
 
-        viewModel.testObject.observe(viewLifecycleOwner, Observer {
+        viewModel.repoInfo.observe(viewLifecycleOwner, Observer {
             recyclerView.layoutManager = layoutManager
             val repoList = mutableListOf<RepoViewModel>()
             it.second?.forEach { repoList.add(RepoViewModel(viewModel).apply { singleRepo.value = it }) }
