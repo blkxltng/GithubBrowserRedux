@@ -1,6 +1,6 @@
 package com.blkxltng.githubbrowserredux.models
 
-class Repo (
+class GitHubRepo (
     val id: Int,
     val name: String,
     val private: Boolean,

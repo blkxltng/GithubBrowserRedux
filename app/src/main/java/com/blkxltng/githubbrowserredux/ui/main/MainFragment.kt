@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView.OnEditorActionListener
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -79,6 +78,7 @@ class MainFragment : Fragment() {
     private fun setupObservers() {
 
         viewModel.searchClickedEvent.observe(viewLifecycleOwner, Observer {
+            recyclerView.clear()
             if(isNetworkConnected()) {
                 hideKeyboard()
                 viewModel.continueSearch()
@@ -90,27 +90,30 @@ class MainFragment : Fragment() {
         viewModel.repoInfo.observe(viewLifecycleOwner, Observer {
             recyclerView.layoutManager = layoutManager
             val repoList = mutableListOf<RepoViewModel>()
-            it.second?.forEach { repoList.add(RepoViewModel(viewModel).apply { singleRepo.value = it }) }
-            recyclerView.setControllerAndBuildModels(MainEpoxyController(organization = it.first!!, repos = repoList))
+            it?.second?.forEach { repoList.add(RepoViewModel(viewModel).apply { singleRepo.value = it }) }
+
+            val mainEpoxyController = MainEpoxyController()
+            mainEpoxyController.setData(it?.first, repoList)
+            recyclerView.setController(mainEpoxyController)
         })
 
         viewModel.repoClickedEvent.observe(viewLifecycleOwner, Observer {
             findNavController().navigate(MainFragmentDirections.actionMainFragmentToWebViewFragment(it.html_url))
-//            val builder = CustomTabsIntent.Builder()
-//            val customTabsIntent = builder.build()
-//            customTabsIntent.launchUrl(context, Uri.parse(it.html_url))
         })
 
         viewModel.errorCode.observe(viewLifecycleOwner, Observer {
             val message = when(it) {
-                MainViewModel.GitHubErrorCode.ERROR_REPO -> "Issue retrieving repositories list"
-                MainViewModel.GitHubErrorCode.ERROR_ORGANIZATION -> "Issue retrieving organization"
-                MainViewModel.GitHubErrorCode.NO_CONNECTION -> "Please connect to the internet and try again"
-                MainViewModel.GitHubErrorCode.NOT_FOUND -> "No organization was found with the input username"
-                MainViewModel.GitHubErrorCode.NO_INPUT -> "Please input a organization username"
-                else -> "There was an error"
+                MainViewModel.GitHubErrorCode.ERROR_REPO -> context?.getString(R.string.error_repo)
+                MainViewModel.GitHubErrorCode.ERROR_ORGANIZATION -> context?.getString(R.string.error_org)
+                MainViewModel.GitHubErrorCode.NO_CONNECTION -> context?.getString(R.string.error_no_connection)
+                MainViewModel.GitHubErrorCode.NOT_FOUND -> context?.getString(R.string.error_org_not_found, viewModel.searchQuery.value)
+                MainViewModel.GitHubErrorCode.NO_INPUT -> context?.getString(R.string.error_no_input)
+                else -> context?.getString(R.string.error_generic)
             }
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+
+            val errorEpoxyController = ErrorEpoxyController()
+            errorEpoxyController.setData(message)
+            recyclerView.setController(errorEpoxyController)
         })
     }
 

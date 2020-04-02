@@ -1,16 +1,17 @@
 package com.blkxltng.githubbrowserredux.ui.main
 
-import com.airbnb.epoxy.EpoxyController
+import com.airbnb.epoxy.Typed2EpoxyController
 import com.blkxltng.githubbrowserredux.itemOrganization
 import com.blkxltng.githubbrowserredux.itemRepo
-import com.blkxltng.githubbrowserredux.models.Organization
-import com.blkxltng.githubbrowserredux.models.Repo
+import com.blkxltng.githubbrowserredux.models.GitHubOrganization
 
-class MainEpoxyController(val organization: Organization, val repos: List<RepoViewModel>?) : EpoxyController() {
-    override fun buildModels() {
+class MainEpoxyController : Typed2EpoxyController<GitHubOrganization?, List<RepoViewModel>?>() {
+
+    override fun buildModels(gitHubOrganization: GitHubOrganization?, repos: List<RepoViewModel>?) {
+
         itemOrganization {
             id("organizationLayout")
-            organization(organization)
+            organization(gitHubOrganization)
         }
 
         repos?.forEach {
@@ -20,4 +21,5 @@ class MainEpoxyController(val organization: Organization, val repos: List<RepoVi
             }
         }
     }
+
 }

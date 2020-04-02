@@ -3,8 +3,8 @@ package com.blkxltng.githubbrowserredux.ui.main
 import android.view.View
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.blkxltng.githubbrowserredux.models.Organization
-import com.blkxltng.githubbrowserredux.models.Repo
+import com.blkxltng.githubbrowserredux.models.GitHubOrganization
+import com.blkxltng.githubbrowserredux.models.GitHubRepo
 import com.blkxltng.githubbrowserredux.network.GithubService
 import com.blkxltng.githubbrowserredux.utils.LiveEvent
 import retrofit2.Call
@@ -13,11 +13,11 @@ import retrofit2.Response
 
 class MainViewModel : ViewModel() {
 
-    val selectedOrganization = MutableLiveData<Organization>() // Used to hold the info for the organization
-    val repoClickedEvent = LiveEvent<Repo>() // Called when the user clicks a repository
+    val selectedOrganization = MutableLiveData<GitHubOrganization>() // Used to hold the info for the organization
+    val repoClickedEvent = LiveEvent<GitHubRepo>() // Called when the user clicks a repository
     val searchClickedEvent = LiveEvent<Void>() // Called when the user clicks the search button
     val searchQuery = MutableLiveData<String>() // Used to keep track of the user's edittext input
-    val repoInfo = MutableLiveData<Pair<Organization?, List<Repo>?>>() // Holds information for the repos as well as the organization
+    val repoInfo = MutableLiveData<Pair<GitHubOrganization?, List<GitHubRepo>?>?>() // Holds information for the repos as well as the organization
     val progressVisibility = MutableLiveData(View.GONE) // Used to set progressBar visibility
     val errorCode = LiveEvent<GitHubErrorCode>() // Used when there is an error to send the user a message
 
@@ -40,8 +40,8 @@ class MainViewModel : ViewModel() {
 
         val organizationResponse = githubService.getOrganization(organizationName!!)
 
-        organizationResponse.enqueue(object: Callback<Organization> {
-            override fun onResponse(call: Call<Organization>, response: Response<Organization>) {
+        organizationResponse.enqueue(object: Callback<GitHubOrganization> {
+            override fun onResponse(call: Call<GitHubOrganization>, response: Response<GitHubOrganization>) {
                 if (response.isSuccessful) {
                     selectedOrganization.postValue(response.body())
                     loadRepos(organizationName)
@@ -53,7 +53,7 @@ class MainViewModel : ViewModel() {
                 }
             }
 
-            override fun onFailure(call: Call<Organization>, t: Throwable) {
+            override fun onFailure(call: Call<GitHubOrganization>, t: Throwable) {
                 errorCode.postValue(GitHubErrorCode.ERROR_ORGANIZATION)
                 progressVisibility.postValue(View.GONE)
             }
@@ -64,13 +64,13 @@ class MainViewModel : ViewModel() {
 
         val reposResponse = githubService.getOrganizationRepos(organizationName!!)
 
-        reposResponse.enqueue(object: Callback<List<Repo>> {
-            override fun onFailure(call: Call<List<Repo>>, t: Throwable) {
+        reposResponse.enqueue(object: Callback<List<GitHubRepo>> {
+            override fun onFailure(call: Call<List<GitHubRepo>>, t: Throwable) {
                 errorCode.postValue(GitHubErrorCode.ERROR_REPO)
                 progressVisibility.postValue(View.GONE)
             }
 
-            override fun onResponse(call: Call<List<Repo>>, response: Response<List<Repo>>) {
+            override fun onResponse(call: Call<List<GitHubRepo>>, response: Response<List<GitHubRepo>>) {
                 if (response.isSuccessful) {
                     progressVisibility.postValue(View.GONE)
                     val smallerList = response.body()?.sortedBy { it.stargazers_count }?.reversed()?.take(3)

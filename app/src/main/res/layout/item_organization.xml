@@ -6,7 +6,7 @@
     <data>
         <variable
             name="organization"
-            type="com.blkxltng.githubbrowserredux.models.Organization" />
+            type="com.blkxltng.githubbrowserredux.models.GitHubOrganization" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -31,6 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:layout_marginStart="10dp"
+            android:layout_marginEnd="16dp"
             android:text="@{organization.name}"
             android:textColor="@android:color/black"
             android:textSize="24sp"
@@ -43,11 +44,23 @@
             android:id="@+id/orgDescription"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@{organization.description}"
+            android:layout_marginEnd="16dp"
+            descriptionText="@{organization.description}"
+            android:textStyle="italic"
             app:layout_constraintStart_toStartOf="@id/orgName"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/orgName"
             tools:text="This is a long and complicated description"/>
+
+        <TextView
+            android:id="@+id/orgLocation"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            locationText="@{organization.location}"
+            app:layout_constraintStart_toStartOf="@id/orgName"
+            app:layout_constraintTop_toBottomOf="@id/orgDescription"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
