@@ -10,6 +10,7 @@ import com.blkxltng.githubbrowserredux.utils.LiveEvent
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import timber.log.Timber
 
 class MainViewModel : ViewModel() {
 
@@ -56,6 +57,7 @@ class MainViewModel : ViewModel() {
             override fun onFailure(call: Call<GitHubOrganization>, t: Throwable) {
                 errorCode.postValue(GitHubErrorCode.ERROR_ORGANIZATION)
                 progressVisibility.postValue(View.GONE)
+                Timber.d(t)
             }
         })
     }
@@ -68,6 +70,7 @@ class MainViewModel : ViewModel() {
             override fun onFailure(call: Call<List<GitHubRepo>>, t: Throwable) {
                 errorCode.postValue(GitHubErrorCode.ERROR_REPO)
                 progressVisibility.postValue(View.GONE)
+                Timber.d(t)
             }
 
             override fun onResponse(call: Call<List<GitHubRepo>>, response: Response<List<GitHubRepo>>) {
