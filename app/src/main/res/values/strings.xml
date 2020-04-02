@@ -1,3 +1,20 @@
 <resources>
     <string name="app_name">GithubBrowserRedux</string>
+
+    <!-- fragment_main strings -->
+    <string name="enter_username_prompt">Please enter the username for the organization you would like to look up! (Not case sensitive.)</string>
+    <string name="search">Search</string>
+    <string name="hint_org_username">Organization Username</string>
+
+    <!-- item_organization strings -->
+    <string name="org_location">Location: %1s</string>
+
+    <!-- Errors -->
+    <string name="error_repo">Issue retrieving repositories list.</string>
+    <string name="error_org">Issue retrieving organization.</string>
+    <string name="error_no_connection">Please connect to the internet and try again.</string>
+    <string name="error_no_input">Please input a organization username.</string>
+    <string name="error_org_not_found">No organization was found with the username \"%1s.\"</string>
+    <string name="error_generic">There was an error.</string>
+    <string name="error_no_description">No description found.</string>
 </resources>

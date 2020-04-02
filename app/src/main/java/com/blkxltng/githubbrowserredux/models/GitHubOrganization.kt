@@ -1,6 +1,6 @@
 package com.blkxltng.githubbrowserredux.models
 
-class Organization (
+class GitHubOrganization (
     val id: Int,
     val login: String,
     val repos_url: String,
