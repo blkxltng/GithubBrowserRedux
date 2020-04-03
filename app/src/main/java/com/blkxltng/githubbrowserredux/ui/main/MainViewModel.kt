@@ -13,6 +13,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Singleton
 
 class MainViewModel : ViewModel() {
 
@@ -25,6 +26,7 @@ class MainViewModel : ViewModel() {
     val errorCode = LiveEvent<GitHubErrorCode>() // Used when there is an error to send the user a message
 
     @Inject
+    @Singleton
     lateinit var githubService: GithubService
 
     init {
