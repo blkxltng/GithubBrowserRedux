@@ -14,7 +14,6 @@ import timber.log.Timber
 
 class MainViewModel : ViewModel() {
 
-    val selectedOrganization = MutableLiveData<GitHubOrganization>() // Used to hold the info for the organization
     val repoClickedEvent = LiveEvent<GitHubRepo>() // Called when the user clicks a repository
     val searchClickedEvent = LiveEvent<Void>() // Called when the user clicks the search button
     val searchQuery = MutableLiveData<String>() // Used to keep track of the user's edittext input
@@ -23,6 +22,8 @@ class MainViewModel : ViewModel() {
     val errorCode = LiveEvent<GitHubErrorCode>() // Used when there is an error to send the user a message
 
     private val githubService: GithubService = GithubService()
+
+    private var foundOrganization: GitHubOrganization? = null
 
     fun searchClicked() {
         searchClickedEvent.call()
@@ -44,7 +45,7 @@ class MainViewModel : ViewModel() {
         organizationResponse.enqueue(object: Callback<GitHubOrganization> {
             override fun onResponse(call: Call<GitHubOrganization>, response: Response<GitHubOrganization>) {
                 if (response.isSuccessful) {
-                    selectedOrganization.postValue(response.body())
+                    foundOrganization = response.body()
                     loadRepos(organizationName)
                 } else {
                     if(response.code() == 404) {
@@ -77,7 +78,7 @@ class MainViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     progressVisibility.postValue(View.GONE)
                     val smallerList = response.body()?.sortedBy { it.stargazers_count }?.reversed()?.take(3)
-                    repoInfo.postValue(Pair(selectedOrganization.value, smallerList))
+                    repoInfo.postValue(Pair(foundOrganization, smallerList))
                 }
             }
         })
