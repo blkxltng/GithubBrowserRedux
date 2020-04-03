@@ -3,6 +3,7 @@ package com.blkxltng.githubbrowserredux.ui.main
 import android.view.View
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.blkxltng.githubbrowserredux.dagger.network.DaggerGitHubAPIFactory
 import com.blkxltng.githubbrowserredux.models.GitHubOrganization
 import com.blkxltng.githubbrowserredux.models.GitHubRepo
 import com.blkxltng.githubbrowserredux.network.GithubService
@@ -11,6 +12,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import timber.log.Timber
+import javax.inject.Inject
 
 class MainViewModel : ViewModel() {
 
@@ -22,7 +24,12 @@ class MainViewModel : ViewModel() {
     val progressVisibility = MutableLiveData(View.GONE) // Used to set progressBar visibility
     val errorCode = LiveEvent<GitHubErrorCode>() // Used when there is an error to send the user a message
 
-    private val githubService: GithubService = GithubService()
+    @Inject
+    lateinit var githubService: GithubService
+
+    init {
+        DaggerGitHubAPIFactory.create().inject(this)
+    }
 
     fun searchClicked() {
         searchClickedEvent.call()
