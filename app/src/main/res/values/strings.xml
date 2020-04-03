@@ -6,6 +6,9 @@
     <string name="search">Search</string>
     <string name="hint_org_username">Organization Username</string>
 
+    <!-- fragment_webview strings -->
+    <string name="retry">Retry</string>
+
     <!-- item_organization strings -->
     <string name="org_location">Location: %1s</string>
 

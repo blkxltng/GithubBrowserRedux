@@ -4,12 +4,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
 import com.blkxltng.githubbrowserredux.R
 import com.blkxltng.githubbrowserredux.databinding.FragmentWebviewBinding
+import com.blkxltng.githubbrowserredux.utils.isNetworkConnected
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_webview.*
 
 class WebViewFragment : Fragment() {
@@ -29,15 +34,47 @@ class WebViewFragment : Fragment() {
         binding.webViewViewModel = viewModel
         binding.executePendingBindings()
         setupObservers()
-        loadUrl()
+        checkConnected()
     }
 
     private fun setupObservers() {
-
+        viewModel.isNetworkConnected.observe(viewLifecycleOwner, Observer {connected ->
+            if(connected) {
+                loadUrl()
+            }
+        })
     }
 
     private fun loadUrl() {
+        viewModel.progressVisibility.postValue(View.VISIBLE)
         webView.loadUrl(args.repoUrl)
+        webView.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+                viewModel.progressVisibility.postValue(View.GONE)
+            }
+        }
+    }
+
+    private fun showSnackbar() {
+        val connSnackbar = Snackbar.make(binding.root, R.string.error_no_connection, Snackbar.LENGTH_INDEFINITE)
+        connSnackbar.setAction(R.string.retry) {
+            connSnackbar.dismiss()
+            if (isNetworkConnected()) {
+                viewModel.isNetworkConnected.postValue(true)
+            } else {
+                showSnackbar()
+            }
+        }
+        connSnackbar.show()
+    }
+
+    private fun checkConnected() {
+        if(isNetworkConnected()) {
+            viewModel.isNetworkConnected.postValue(true)
+        } else {
+            showSnackbar()
+        }
     }
 
 }

@@ -14,10 +14,10 @@ class MainEpoxyController : Typed2EpoxyController<GitHubOrganization?, List<Repo
             organization(gitHubOrganization)
         }
 
-        repos?.forEach {
+        repos?.forEach {repoVM ->
             itemRepo {
-                id("repo${it.singleRepo.value?.id}")
-                repoViewModel(it)
+                id("repo${repoVM.singleRepo.value?.id}")
+                repoViewModel(repoVM)
             }
         }
     }
