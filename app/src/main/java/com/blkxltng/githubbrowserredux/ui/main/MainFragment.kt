@@ -87,22 +87,22 @@ class MainFragment : Fragment() {
             }
         })
 
-        viewModel.repoInfo.observe(viewLifecycleOwner, Observer {
+        viewModel.repoInfo.observe(viewLifecycleOwner, Observer { repoInfo ->
             recyclerView.layoutManager = layoutManager
             val repoList = mutableListOf<RepoViewModel>()
-            it?.second?.forEach { repoList.add(RepoViewModel(viewModel).apply { singleRepo.value = it }) }
+            repoInfo?.second?.forEach { repoList.add(RepoViewModel(viewModel).apply { singleRepo.value = it }) }
 
             val mainEpoxyController = MainEpoxyController()
-            mainEpoxyController.setData(it?.first, repoList)
+            mainEpoxyController.setData(repoInfo?.first, repoList)
             recyclerView.setController(mainEpoxyController)
         })
 
-        viewModel.repoClickedEvent.observe(viewLifecycleOwner, Observer {
-            findNavController().navigate(MainFragmentDirections.actionMainFragmentToWebViewFragment(it.html_url))
+        viewModel.repoClickedEvent.observe(viewLifecycleOwner, Observer { repo ->
+            findNavController().navigate(MainFragmentDirections.actionMainFragmentToWebViewFragment(repo.html_url))
         })
 
-        viewModel.errorCode.observe(viewLifecycleOwner, Observer {
-            val message = when(it) {
+        viewModel.errorCode.observe(viewLifecycleOwner, Observer {error ->
+            val message = when(error) {
                 MainViewModel.GitHubErrorCode.ERROR_REPO -> context?.getString(R.string.error_repo)
                 MainViewModel.GitHubErrorCode.ERROR_ORGANIZATION -> context?.getString(R.string.error_org)
                 MainViewModel.GitHubErrorCode.NO_CONNECTION -> context?.getString(R.string.error_no_connection)

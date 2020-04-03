@@ -66,7 +66,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/watchLayout"
+                    app:layout_constraintEnd_toStartOf="@+id/languageLayout"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintHorizontal_chainStyle="spread_inside"
                     app:layout_constraintStart_toStartOf="parent"
@@ -95,7 +95,7 @@
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/watchLayout"
+                    android:id="@+id/languageLayout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -105,24 +105,24 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <ImageView
-                        android:id="@+id/watchIcon"
+                        android:id="@+id/languageIcon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/ic_watchers_black_24dp"
+                        android:src="@drawable/ic_code_black_24dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
-                        android:id="@+id/watchText"
-                        numCountText="@{repoViewModel.singleRepo.watchers_count}"
+                        android:id="@+id/languageText"
+                        android:text="@{repoViewModel.singleRepo.language}"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
-                        app:layout_constraintBottom_toBottomOf="@id/watchIcon"
-                        app:layout_constraintStart_toEndOf="@id/watchIcon"
-                        app:layout_constraintTop_toTopOf="@id/watchIcon"
-                        tools:text="2347" />
+                        app:layout_constraintBottom_toBottomOf="@id/languageIcon"
+                        app:layout_constraintStart_toEndOf="@id/languageIcon"
+                        app:layout_constraintTop_toTopOf="@id/languageIcon"
+                        tools:text="Kotlin" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -132,7 +132,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toEndOf="@+id/watchLayout"
+                    app:layout_constraintStart_toEndOf="@+id/languageLayout"
                     app:layout_constraintTop_toTopOf="parent">
 
                     <ImageView

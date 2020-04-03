@@ -10,6 +10,6 @@ class GitHubRepo (
     val updated_at: String,
     val pushed_at: String,
     val stargazers_count: Int,
-    val watchers_count: Int,
+    val language: String,
     val default_branch: String
 )
