@@ -1,8 +1,10 @@
 package com.blkxltng.githubbrowserredux
 
+import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.activityScenarioRule
@@ -33,12 +35,36 @@ class RepoRetrievalTest {
 
         // TODO find a better way to check when the response is retrieved
         Thread.sleep(3000)
+        onView(withId(R.id.errorText)).check(matches(withText("Google")))
+
+    }
+
+    @Test
+    fun check_noInput() {
+        // Type text and then press the button.
+        onView(withId(R.id.orgEditText)).perform(typeText(STRING_TO_BE_TYPED_FAILURE), closeSoftKeyboard())
+        onView(withId(R.id.searchButton)).perform(click())
+
+        onView(withId(R.id.errorText)).check(matches(withText("Please input a organization username.")))
+    }
+
+    @Test
+    fun click_Repo() {
+
+        // Type text and then press the button.
+        onView(withId(R.id.orgEditText)).perform(typeText(STRING_TO_BE_TYPED), closeSoftKeyboard())
+        onView(withId(R.id.searchButton)).perform(click())
+
+        // TODO find a better way to check when the response is retrieved
+        Thread.sleep(3000)
         onView(withId(R.id.orgName)).check(matches(withText("Google")))
+        onView(withId(R.id.recyclerView)).perform(RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(2, click()))
 
     }
 
     companion object {
 
         val STRING_TO_BE_TYPED = "Google"
+        val STRING_TO_BE_TYPED_FAILURE = ""
     }
 }
