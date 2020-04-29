@@ -16,7 +16,9 @@ import com.blkxltng.githubbrowserredux.R
 import com.blkxltng.githubbrowserredux.databinding.FragmentMainBinding
 import com.blkxltng.githubbrowserredux.utils.hideKeyboard
 import com.blkxltng.githubbrowserredux.utils.isNetworkConnected
+import com.jakewharton.rxbinding3.view.clicks
 import kotlinx.android.synthetic.main.fragment_main.*
+import java.util.concurrent.TimeUnit
 
 
 class MainFragment : Fragment() {
@@ -73,6 +75,13 @@ class MainFragment : Fragment() {
             }
             false
         })
+
+        // Limit the number of times the search button can be clicked
+        searchButton.clicks()
+            .throttleFirst(500, TimeUnit.MILLISECONDS)
+            .subscribe {
+                viewModel.searchClicked()
+            }
     }
 
     private fun setupObservers() {
