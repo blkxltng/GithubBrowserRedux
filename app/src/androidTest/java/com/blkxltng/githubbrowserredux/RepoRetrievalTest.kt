@@ -64,7 +64,7 @@ class RepoRetrievalTest {
 
     companion object {
 
-        val STRING_TO_BE_TYPED = "Google"
-        val STRING_TO_BE_TYPED_FAILURE = ""
+        const val STRING_TO_BE_TYPED = "Google"
+        const val STRING_TO_BE_TYPED_FAILURE = ""
     }
 }
