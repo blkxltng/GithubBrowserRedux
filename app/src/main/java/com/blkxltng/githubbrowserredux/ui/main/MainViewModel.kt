@@ -8,6 +8,8 @@ import com.blkxltng.githubbrowserredux.models.GitHubOrganization
 import com.blkxltng.githubbrowserredux.models.GitHubRepo
 import com.blkxltng.githubbrowserredux.network.GithubService
 import com.blkxltng.githubbrowserredux.utils.LiveEvent
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.schedulers.Schedulers
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -43,55 +45,92 @@ class MainViewModel : ViewModel() {
             errorCode.postValue(GitHubErrorCode.NO_INPUT)
         } else {
             progressVisibility.postValue(View.VISIBLE)
-            loadOrganization(searchQuery.value)
+//            loadOrganization(searchQuery.value)
+            loadOrganizationReactive(searchQuery.value)
         }
     }
 
-    private fun loadOrganization(organizationName: String?) {
+//    private fun loadOrganization(organizationName: String?) {
+//
+//        val organizationResponse = githubService.getOrganization(organizationName!!)
+//
+//        organizationResponse.enqueue(object: Callback<GitHubOrganization> {
+//            override fun onResponse(call: Call<GitHubOrganization>, response: Response<GitHubOrganization>) {
+//                if (response.isSuccessful) {
+//                    foundOrganization = response.body()
+//                    loadRepos(organizationName)
+//                } else {
+//                    if(response.code() == 404) {
+//                        errorCode.postValue(GitHubErrorCode.NOT_FOUND)
+//                        progressVisibility.postValue(View.GONE)
+//                    }
+//                }
+//            }
+//
+//            override fun onFailure(call: Call<GitHubOrganization>, t: Throwable) {
+//                errorCode.postValue(GitHubErrorCode.ERROR_ORGANIZATION)
+//                progressVisibility.postValue(View.GONE)
+//                Timber.d(t)
+//            }
+//        })
+//    }
 
-        val organizationResponse = githubService.getOrganization(organizationName!!)
+    private fun loadOrganizationReactive(organizationName: String?) {
+        val organizationResponse = githubService.getOrganizationReactive(organizationName)
 
-        organizationResponse.enqueue(object: Callback<GitHubOrganization> {
-            override fun onResponse(call: Call<GitHubOrganization>, response: Response<GitHubOrganization>) {
-                if (response.isSuccessful) {
-                    foundOrganization = response.body()
-                    loadRepos(organizationName)
-                } else {
-                    if(response.code() == 404) {
-                        errorCode.postValue(GitHubErrorCode.NOT_FOUND)
-                        progressVisibility.postValue(View.GONE)
-                    }
-                }
-            }
-
-            override fun onFailure(call: Call<GitHubOrganization>, t: Throwable) {
-                errorCode.postValue(GitHubErrorCode.ERROR_ORGANIZATION)
-                progressVisibility.postValue(View.GONE)
-                Timber.d(t)
-            }
-        })
-    }
-
-    private fun loadRepos(organizationName: String?) {
-
-        val reposResponse = githubService.getOrganizationRepos(organizationName!!)
-
-        reposResponse.enqueue(object: Callback<List<GitHubRepo>> {
-            override fun onFailure(call: Call<List<GitHubRepo>>, t: Throwable) {
+        organizationResponse
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ organization ->
+                foundOrganization = organization
+                loadReposReactive(organizationName)
+            }, { error ->
                 errorCode.postValue(GitHubErrorCode.ERROR_REPO)
                 progressVisibility.postValue(View.GONE)
-                Timber.d(t)
-            }
+                Timber.d(error)
+            })
 
-            override fun onResponse(call: Call<List<GitHubRepo>>, response: Response<List<GitHubRepo>>) {
-                if (response.isSuccessful) {
-                    progressVisibility.postValue(View.GONE)
-                    val smallerList = response.body()?.sortedBy { it.stargazers_count }?.reversed()?.take(3)
-                    repoInfo.postValue(Pair(foundOrganization, smallerList))
-                }
-            }
-        })
     }
+
+//    private fun loadRepos(organizationName: String?) {
+//
+//        val reposResponse = githubService.getOrganizationRepos(organizationName!!)
+//
+//        reposResponse.enqueue(object: Callback<List<GitHubRepo>> {
+//            override fun onFailure(call: Call<List<GitHubRepo>>, t: Throwable) {
+//                errorCode.postValue(GitHubErrorCode.ERROR_REPO)
+//                progressVisibility.postValue(View.GONE)
+//                Timber.d(t)
+//            }
+//
+//            override fun onResponse(call: Call<List<GitHubRepo>>, response: Response<List<GitHubRepo>>) {
+//                if (response.isSuccessful) {
+//                    progressVisibility.postValue(View.GONE)
+//                    val smallerList = response.body()?.sortedBy { it.stargazers_count }?.reversed()?.take(3)
+//                    repoInfo.postValue(Pair(foundOrganization, smallerList))
+//                }
+//            }
+//        })
+//    }
+
+    private fun loadReposReactive(organizationName: String?) {
+
+        val reposResponse = githubService.getOrganizationReposReactive(organizationName)
+
+        reposResponse
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe ({ repoList ->
+                progressVisibility.postValue(View.GONE)
+                val smallerList = repoList.sortedBy { it.stargazers_count }.reversed().take(3)
+                repoInfo.postValue(Pair(foundOrganization, smallerList))
+            }, { error ->
+                errorCode.postValue(GitHubErrorCode.ERROR_REPO)
+                progressVisibility.postValue(View.GONE)
+                Timber.d(error)
+            })
+
+            }
 
     enum class GitHubErrorCode {
         NOT_FOUND, NO_CONNECTION, ERROR_ORGANIZATION, ERROR_REPO, NO_INPUT
