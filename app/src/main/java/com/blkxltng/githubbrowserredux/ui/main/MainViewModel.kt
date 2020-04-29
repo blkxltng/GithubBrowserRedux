@@ -85,7 +85,11 @@ class MainViewModel : ViewModel() {
                 foundOrganization = organization
                 loadReposReactive(organizationName)
             }, { error ->
-                errorCode.postValue(GitHubErrorCode.ERROR_REPO)
+                if(error.message.equals("HTTP 404 Not Found")) {
+                    errorCode.postValue(GitHubErrorCode.NOT_FOUND)
+                } else {
+                    errorCode.postValue(GitHubErrorCode.ERROR_REPO)
+                }
                 progressVisibility.postValue(View.GONE)
                 Timber.d(error)
             })

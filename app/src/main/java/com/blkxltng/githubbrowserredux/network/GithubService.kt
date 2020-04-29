@@ -3,7 +3,6 @@ package com.blkxltng.githubbrowserredux.network
 import com.blkxltng.githubbrowserredux.models.GitHubOrganization
 import com.blkxltng.githubbrowserredux.models.GitHubRepo
 import io.reactivex.rxjava3.core.Observable
-import retrofit2.Call
 import javax.inject.Inject
 
 class GithubService @Inject constructor(private val githubAPI: GithubAPI) {
